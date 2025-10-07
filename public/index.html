@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traintrek - Modern Train Booking</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-train"></i>
+                <span>Traintrek</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="hero">
+            <h1>Book Your Journey With A Dash of Luck</h1>
+            <p>Experience the future of train booking with our unique lucky confirmation feature.</p>
+        </section>
+
+        <section class="search-card animate-in">
+            <h2><i class="fas fa-search"></i> Find Your Train</h2>
+            <div class="input-group">
+                <div class="input-container">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" id="sourceInput" placeholder="From Station">
+                </div>
+                <div class="input-container">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" id="destInput" placeholder="To Station">
+                </div>
+            </div>
+            <button class="btn" id="searchBtn"><i class="fas fa-search"></i> Search Trains</button>
+        </section>
+
+        <section class="results-section" id="resultsContainer">
+            <!-- Results will be populated by JavaScript -->
+        </section>
+
+        <section class="lucky-section" id="luckySection" hidden>
+            <h2>Feeling Lucky?</h2>
+            <p>Your ticket is waitlisted. Try the lucky coin flip for a chance to upgrade!</p>
+            <div class="coin" id="luckyCoin">
+                <i class="fas fa-coins"></i>
+            </div>
+            <p id="flipResult">Click the coin to try your luck!</p>
+        </section>
+    </div>
+
+    <!-- User Details Modal -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <i class="fas fa-user" style="font-size: 3rem; color: var(--primary);"></i>
+            <h2>Enter Passenger Details</h2>
+            <div class="input-container" style="margin: 1rem 0; width: 100%;">
+                <i class="fas fa-user"></i>
+                <input type="text" id="userNameInput" placeholder="Full Name" style="width: 100%;">
+            </div>
+            <button class="btn" id="confirmBookingBtn" style="width: 100%;">
+                <i class="fas fa-check"></i> Confirm Booking
+            </button>
+        </div>
+    </div>
+
+    <!-- Booking Confirmation Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <i class="fas fa-ticket-alt" style="font-size: 3rem; color: var(--primary);"></i>
+            <h2>Booking Successful!</h2>
+            <p>Your ticket has been reserved with status:</p>
+            <div class="status-badge" id="bookingStatusBadge">Confirmed</div>
+            <div id="bookingDetails"></div>
+            <button class="btn" id="downloadTicketBtn" style="margin-top: 1rem; width: 100%;">
+                <i class="fas fa-download"></i> Download Ticket
+            </button>
+            <button class="btn" id="newBookingBtn" style="background: var(--secondary); width: 100%; margin-top: 0.5rem;">
+                <i class="fas fa-plus"></i> New Booking
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Traintrek. The modern way to book train tickets.</p>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>
