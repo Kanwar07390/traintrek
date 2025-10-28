@@ -2,6 +2,8 @@
 let searchBtn, sourceInput, destInput, resultsContainer, luckySection, luckyCoin;
 let flipResult, bookingModal, closeModal, bookingStatusBadge, bookingDetails;
 let downloadTicketBtn, newBookingBtn, userModal, userNameInput, confirmBookingBtn;
+let bookingHistoryBtn, bookingHistoryModal, closeHistoryModal, bookingHistoryContent;
+let searchHistoryBtn, historyEmailInput, historyPhoneInput, userEmailInput, userPhoneInput, journeyDateInput;
 
 // Global variables
 let currentBooking = null;
@@ -11,7 +13,7 @@ let selectedTrainId = null;
 document.addEventListener('DOMContentLoaded', function() {
     initializeDOMElements();
     setupEventListeners();
-    loadAllTrains();
+    loadAllTrains(); // This should only be called once
 });
 
 // Initialize all DOM elements
@@ -33,6 +35,18 @@ function initializeDOMElements() {
     userNameInput = document.getElementById('userNameInput');
     confirmBookingBtn = document.getElementById('confirmBookingBtn');
     
+    // Booking History Elements
+    bookingHistoryBtn = document.getElementById('bookingHistoryBtn');
+    bookingHistoryModal = document.getElementById('bookingHistoryModal');
+    closeHistoryModal = document.querySelector('.close-history-modal');
+    bookingHistoryContent = document.getElementById('bookingHistoryContent');
+    searchHistoryBtn = document.getElementById('searchHistoryBtn');
+    historyEmailInput = document.getElementById('historyEmailInput');
+    historyPhoneInput = document.getElementById('historyPhoneInput');
+    userEmailInput = document.getElementById('userEmailInput');
+    userPhoneInput = document.getElementById('userPhoneInput');
+    journeyDateInput = document.getElementById('journeyDateInput');
+    
     console.log('DOM Elements initialized');
 }
 
@@ -46,10 +60,18 @@ function setupEventListeners() {
     if (newBookingBtn) newBookingBtn.addEventListener('click', resetAndCloseModal);
     if (confirmBookingBtn) confirmBookingBtn.addEventListener('click', confirmBooking);
     
+    // Booking History Event Listeners
+    if (bookingHistoryBtn) bookingHistoryBtn.addEventListener('click', showBookingHistoryModal);
+    if (closeHistoryModal) closeHistoryModal.addEventListener('click', () => {
+        if (bookingHistoryModal) bookingHistoryModal.style.display = 'none';
+    });
+    if (searchHistoryBtn) searchHistoryBtn.addEventListener('click', searchBookingHistory);
+    
     // Close modals when clicking outside
     window.addEventListener('click', (e) => {
         if (bookingModal && e.target === bookingModal) bookingModal.style.display = 'none';
         if (userModal && e.target === userModal) userModal.style.display = 'none';
+        if (bookingHistoryModal && e.target === bookingHistoryModal) bookingHistoryModal.style.display = 'none';
     });
 }
 
@@ -96,7 +118,7 @@ function displayResults(trains) {
     
     resultsContainer.innerHTML = '';
     
-    if (trains.length === 0) {
+    if (!trains || trains.length === 0) {
         resultsContainer.innerHTML = '<p class="no-results">No trains found for this route</p>';
         return;
     }
@@ -172,9 +194,12 @@ function bookTrain(trainId) {
     }
 }
 
-// Confirm booking with user name
+// Confirm booking with user details
 async function confirmBooking() {
     const userName = userNameInput ? userNameInput.value.trim() : '';
+    const userEmail = userEmailInput ? userEmailInput.value.trim() : '';
+    const userPhone = userPhoneInput ? userPhoneInput.value.trim() : '';
+    const journeyDate = journeyDateInput ? journeyDateInput.value : '';
     
     if (!userName) {
         alert('Please enter your name');
@@ -200,7 +225,10 @@ async function confirmBooking() {
             },
             body: JSON.stringify({ 
                 trainId: selectedTrainId,
-                userName: userName 
+                userName: userName,
+                userEmail: userEmail,
+                userPhone: userPhone,
+                journeyDate: journeyDate
             })
         });
         
@@ -240,7 +268,21 @@ function showBookingResult(booking) {
         <p>Booking ID: <strong>${booking.id}</strong></p>
         <p>PNR: <strong>${booking.pnr}</strong></p>
         ${booking.coach ? `<p>Coach: <strong>${booking.coach}</strong>, Seat: <strong>${booking.seat_number}</strong></p>` : ''}
+        ${booking.user_email ? `<p>Email: <strong>${booking.user_email}</strong></p>` : ''}
+        ${booking.user_phone ? `<p>Phone: <strong>${booking.user_phone}</strong></p>` : ''}
+        ${booking.journey_date ? `<p>Journey Date: <strong>${new Date(booking.journey_date).toLocaleDateString()}</strong></p>` : ''}
     `;
+    
+    // Show upgrade info for WL/RAC tickets
+    if (booking.status === 'WL' || booking.status === 'RAC') {
+        const upgradeInfo = document.createElement('p');
+        upgradeInfo.className = 'upgrade-info';
+        upgradeInfo.innerHTML = `
+            <i class="fas fa-rocket"></i> 
+            Use <strong>Lucky Confirm</strong> below to try upgrading your ${booking.status} status!
+        `;
+        bookingDetails.appendChild(upgradeInfo);
+    }
     
     bookingModal.style.display = 'flex';
     
@@ -381,16 +423,31 @@ function updateBookingUI() {
     bookingStatusBadge.textContent = currentBooking.status;
     
     // Update booking details with coach/seat if confirmed
+    let detailsHTML = `
+        <p>Passenger: <strong>${currentBooking.user_name}</strong></p>
+        <p>Train: <strong>${currentBooking.train_name}</strong></p>
+        <p>From: <strong>${currentBooking.source}</strong> To: <strong>${currentBooking.destination}</strong></p>
+        <p>Booking ID: <strong>${currentBooking.id}</strong></p>
+        <p>PNR: <strong>${currentBooking.pnr}</strong></p>
+    `;
+    
     if (currentBooking.status === 'CONFIRMED' && currentBooking.coach) {
-        bookingDetails.innerHTML = `
-            <p>Passenger: <strong>${currentBooking.user_name}</strong></p>
-            <p>Train: <strong>${currentBooking.train_name}</strong></p>
-            <p>From: <strong>${currentBooking.source}</strong> To: <strong>${currentBooking.destination}</strong></p>
-            <p>Booking ID: <strong>${currentBooking.id}</strong></p>
-            <p>PNR: <strong>${currentBooking.pnr}</strong></p>
-            <p>Coach: <strong>${currentBooking.coach}</strong>, Seat: <strong>${currentBooking.seat_number}</strong></p>
-        `;
+        detailsHTML += `<p>Coach: <strong>${currentBooking.coach}</strong>, Seat: <strong>${currentBooking.seat_number}</strong></p>`;
     }
+    
+    if (currentBooking.user_email) {
+        detailsHTML += `<p>Email: <strong>${currentBooking.user_email}</strong></p>`;
+    }
+    
+    if (currentBooking.user_phone) {
+        detailsHTML += `<p>Phone: <strong>${currentBooking.user_phone}</strong></p>`;
+    }
+    
+    if (currentBooking.journey_date) {
+        detailsHTML += `<p>Journey Date: <strong>${new Date(currentBooking.journey_date).toLocaleDateString()}</strong></p>`;
+    }
+    
+    bookingDetails.innerHTML = detailsHTML;
     
     // Hide lucky section if confirmed
     if (currentBooking.status === 'CONFIRMED') {
@@ -404,6 +461,160 @@ function updateBookingUI() {
             flipResult.innerHTML = 'Click the coin to try your luck for CONFIRMED upgrade!';
         }
     }
+}
+
+// BOOKING HISTORY FUNCTIONS
+
+// Show booking history modal
+function showBookingHistoryModal() {
+    if (!bookingHistoryModal) {
+        console.error('Booking history modal not found');
+        return;
+    }
+    
+    bookingHistoryModal.style.display = 'flex';
+    
+    // Clear previous results
+    if (bookingHistoryContent) {
+        bookingHistoryContent.innerHTML = '<p class="no-results">Enter your email or phone number to view booking history</p>';
+    }
+    
+    // Clear inputs
+    if (historyEmailInput) historyEmailInput.value = '';
+    if (historyPhoneInput) historyPhoneInput.value = '';
+}
+
+// Search booking history
+async function searchBookingHistory() {
+    const email = historyEmailInput ? historyEmailInput.value.trim() : '';
+    const phone = historyPhoneInput ? historyPhoneInput.value.trim() : '';
+    
+    if (!email && !phone) {
+        alert('Please enter either email or phone number');
+        return;
+    }
+    
+    showLoading('Searching your booking history...');
+    
+    try {
+        const response = await fetch(`/api/bookings/history?email=${email}&phone=${phone}`);
+        const data = await response.json();
+        
+        hideLoading();
+        
+        if (data.success) {
+            await displayBookingHistory(data.bookings);
+        } else {
+            if (bookingHistoryContent) {
+                bookingHistoryContent.innerHTML = `<p class="no-results">${data.message}</p>`;
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching booking history:', error);
+        hideLoading();
+        if (bookingHistoryContent) {
+            bookingHistoryContent.innerHTML = '<p class="no-results">Error fetching booking history. Please try again.</p>';
+        }
+    }
+}
+
+// Show upgrade history for a booking
+async function showUpgradeHistory(bookingId) {
+    try {
+        const response = await fetch(`/api/bookings/${bookingId}/upgrade-history`);
+        const data = await response.json();
+        
+        if (data.success && data.upgradeHistory.length > 0) {
+            return data.upgradeHistory;
+        }
+        return [];
+    } catch (error) {
+        console.error('Error fetching upgrade history:', error);
+        return [];
+    }
+}
+
+// Display booking history with upgrade info
+async function displayBookingHistory(bookings) {
+    if (!bookingHistoryContent) return;
+    
+    bookingHistoryContent.innerHTML = '';
+    
+    if (!bookings || bookings.length === 0) {
+        bookingHistoryContent.innerHTML = '<p class="no-results">No bookings found for this email/phone number</p>';
+        return;
+    }
+    
+    for (const booking of bookings) {
+        const upgradeHistory = await showUpgradeHistory(booking.id);
+        const bookingCard = document.createElement('div');
+        bookingCard.className = 'booking-history-card animate-in';
+        
+        let statusClass = 'status-confirmed';
+        if (booking.status === 'RAC') statusClass = 'status-rac';
+        if (booking.status === 'WL') statusClass = 'status-wl';
+        if (booking.status === 'CANCELLED') statusClass = 'status-cancelled';
+        
+        // Add special class if booking was upgraded
+        if (upgradeHistory.length > 0) {
+            bookingCard.classList.add('booking-upgraded');
+        }
+        
+        bookingCard.innerHTML = `
+            <div class="booking-history-header">
+                <span class="booking-pnr">PNR: ${booking.pnr || 'N/A'}</span>
+                <span class="status-badge ${statusClass}">${booking.status}</span>
+            </div>
+            <div class="booking-history-details">
+                <p><strong>Passenger:</strong> ${booking.user_name}</p>
+                <p><strong>Train:</strong> ${booking.train_name}</p>
+                <p><strong>Route:</strong> ${booking.source} → ${booking.destination}</p>
+                <p><strong>Journey Date:</strong> ${booking.journey_date ? new Date(booking.journey_date).toLocaleDateString() : 'Not specified'}</p>
+                <p><strong>Booked On:</strong> ${new Date(booking.booking_time).toLocaleString()}</p>
+                ${booking.coach ? `<p><strong>Coach:</strong> ${booking.coach}, <strong>Seat:</strong> ${booking.seat_number}</p>` : ''}
+                ${booking.user_email ? `<p><strong>Email:</strong> ${booking.user_email}</p>` : ''}
+                ${booking.user_phone ? `<p><strong>Phone:</strong> ${booking.user_phone}</p>` : ''}
+                
+                ${upgradeHistory.length > 0 ? `
+                    <div class="upgrade-history-section">
+                        <p class="upgrade-title"><strong>🎉 Upgrade History:</strong></p>
+                        ${upgradeHistory.map(upgrade => `
+                            <div class="upgrade-item">
+                                <span class="upgrade-arrow">${getStatusEmoji(upgrade.old_status)} → ${getStatusEmoji(upgrade.new_status)}</span>
+                                <span class="upgrade-details">${formatUpgradeType(upgrade.upgrade_type)} on ${new Date(upgrade.created_at).toLocaleString()}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                
+                ${booking.upgrade_count > 0 && upgradeHistory.length === 0 ? `
+                    <p class="upgrade-info">✨ This booking was upgraded ${booking.upgrade_count} time(s)</p>
+                ` : ''}
+            </div>
+        `;
+        
+        bookingHistoryContent.appendChild(bookingCard);
+    }
+}
+
+// Helper functions for upgrade history
+function getStatusEmoji(status) {
+    const emojis = {
+        'WL': '⏳',
+        'RAC': '🔄', 
+        'CONFIRMED': '✅',
+        'CANCELLED': '❌'
+    };
+    return emojis[status] || status;
+}
+
+function formatUpgradeType(type) {
+    const types = {
+        'lucky_confirm': 'Lucky Coin Flip',
+        'auto_upgrade': 'Automatic Upgrade',
+        'cancellation_upgrade': 'Cancellation Chain'
+    };
+    return types[type] || type;
 }
 
 // Show loading
@@ -469,7 +680,7 @@ function resetAndCloseModal() {
     resetSearch();
 }
 
-// Reset search
+// Reset search - FIXED: Remove the recursive call to loadAllTrains
 function resetSearch() {
     if (sourceInput) sourceInput.value = '';
     if (destInput) destInput.value = '';
@@ -478,8 +689,8 @@ function resetSearch() {
     currentBooking = null;
     selectedTrainId = null;
     
-    // Reload all trains
-    loadAllTrains();
+    // Just clear the results, don't reload trains automatically
+    resultsContainer.innerHTML = '<p class="no-results">Search for trains to see results</p>';
 }
 
 // Add CSS animations

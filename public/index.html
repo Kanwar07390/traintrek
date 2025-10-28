@@ -10,9 +10,16 @@
 <body>
     <header>
         <div class="container">
-            <div class="logo">
-                <i class="fas fa-train"></i>
-                <span>Traintrek</span>
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-train"></i>
+                    <span>Traintrek</span>
+                </div>
+                <div class="nav-buttons">
+                    <button id="bookingHistoryBtn" class="btn btn-secondary">
+                        <i class="fas fa-history"></i> Booking History
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -58,9 +65,29 @@
             <button class="close-modal">&times;</button>
             <i class="fas fa-user" style="font-size: 3rem; color: var(--primary);"></i>
             <h2>Enter Passenger Details</h2>
-            <div class="input-container" style="margin: 1rem 0; width: 100%;">
-                <i class="fas fa-user"></i>
-                <input type="text" id="userNameInput" placeholder="Full Name" style="width: 100%;">
+            <div class="form-group">
+                <div class="input-container">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="userNameInput" placeholder="Full Name *" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-container">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="userEmailInput" placeholder="Email Address (for booking history)">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-container">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="userPhoneInput" placeholder="Phone Number (for booking history)">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-container">
+                    <i class="fas fa-calendar"></i>
+                    <input type="date" id="journeyDateInput">
+                </div>
             </div>
             <button class="btn" id="confirmBookingBtn" style="width: 100%;">
                 <i class="fas fa-check"></i> Confirm Booking
@@ -83,6 +110,37 @@
             <button class="btn" id="newBookingBtn" style="background: var(--secondary); width: 100%; margin-top: 0.5rem;">
                 <i class="fas fa-plus"></i> New Booking
             </button>
+        </div>
+    </div>
+
+    <!-- Booking History Modal -->
+    <div class="modal" id="bookingHistoryModal">
+        <div class="modal-content">
+            <button class="close-modal close-history-modal">&times;</button>
+            <i class="fas fa-history" style="font-size: 3rem; color: var(--primary);"></i>
+            <h2>Booking History</h2>
+            
+            <div class="history-search-form">
+                <div class="form-group">
+                    <div class="input-container">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="historyEmailInput" placeholder="Enter your email address">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-container">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="historyPhoneInput" placeholder="Enter your phone number">
+                    </div>
+                </div>
+                <button id="searchHistoryBtn" class="btn" style="width: 100%;">
+                    <i class="fas fa-search"></i> Search Booking History
+                </button>
+            </div>
+            
+            <div id="bookingHistoryContent" class="booking-history-content">
+                <p class="no-results">Enter your email or phone number to view booking history</p>
+            </div>
         </div>
     </div>
 

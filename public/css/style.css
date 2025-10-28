@@ -7,6 +7,7 @@
     --success: #38b000;
     --warning: #ff9500;
     --gradient: linear-gradient(135deg, var(--primary), var(--accent));
+    --danger: #dc3545;
 }
 
 * {
@@ -42,6 +43,12 @@ header {
     z-index: 100;
 }
 
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .logo {
     display: flex;
     align-items: center;
@@ -53,6 +60,21 @@ header {
 
 .logo i {
     color: var(--secondary);
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
 }
 
 /* Hero Section */
@@ -143,6 +165,16 @@ input, select {
 .btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.form-group .input-container {
+    margin-bottom: 0;
 }
 
 /* Results Section */
@@ -246,7 +278,9 @@ input, select {
     border-radius: 20px;
     padding: 2rem;
     width: 90%;
-    max-width: 500px;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
     text-align: center;
     position: relative;
 }
@@ -283,6 +317,10 @@ input, select {
     background: var(--secondary);
 }
 
+.status-cancelled {
+    background: var(--danger);
+}
+
 /* Lucky Section */
 .lucky-section {
     text-align: center;
@@ -311,6 +349,116 @@ input, select {
     transform: rotate(15deg);
 }
 
+/* Booking History Styles */
+.history-search-form {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin: 1.5rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.booking-history-content {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 1rem;
+}
+
+.booking-history-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.booking-history-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.booking-upgraded {
+    border-left: 4px solid var(--success) !important;
+    background: linear-gradient(90deg, rgba(56, 176, 0, 0.1), transparent) !important;
+}
+
+.booking-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.booking-pnr {
+    font-weight: bold;
+    color: var(--primary);
+    font-family: monospace;
+    font-size: 1.1rem;
+}
+
+.booking-history-details p {
+    margin: 0.5rem 0;
+    color: var(--light);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.booking-history-details strong {
+    color: white;
+}
+
+/* Upgrade History Styles */
+.upgrade-history-section {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border-left: 3px solid var(--success);
+}
+
+.upgrade-title {
+    color: var(--success) !important;
+    font-weight: 600;
+    margin-bottom: 0.5rem !important;
+}
+
+.upgrade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.upgrade-item:last-child {
+    border-bottom: none;
+}
+
+.upgrade-arrow {
+    font-weight: 600;
+    color: var(--success);
+}
+
+.upgrade-details {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.upgrade-info {
+    color: var(--success) !important;
+    font-weight: 600;
+    margin-top: 0.5rem !important;
+    padding: 0.5rem;
+    background: rgba(56, 176, 0, 0.1);
+    border-radius: 5px;
+    text-align: center;
+}
+
 /* Footer */
 footer {
     text-align: center;
@@ -326,21 +474,6 @@ footer {
 
 .animate-in {
     animation: fadeIn 0.5s ease forwards;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .hero h1 {
-        font-size: 2.5rem;
-    }
-    
-    .input-group {
-        flex-direction: column;
-    }
-    
-    .results-section {
-        grid-template-columns: 1fr;
-    }
 }
 
 /* Additional Styles for Notifications */
@@ -389,4 +522,76 @@ footer {
 
 @keyframes spin {
     100% { transform: rotate(360deg); }
+}
+
+/* Scrollbar Styling */
+.booking-history-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.booking-history-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.booking-history-content::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 3px;
+}
+
+.booking-history-content::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+}
+
+/* Animation for new upgrades */
+@keyframes highlightUpgrade {
+    0% { background: rgba(56, 176, 0, 0.3); }
+    100% { background: rgba(56, 176, 0, 0.1); }
+}
+
+.highlight-upgrade {
+    animation: highlightUpgrade 2s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .input-group {
+        flex-direction: column;
+    }
+    
+    .results-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .nav-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .booking-history-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .modal-content {
+        margin: 1rem;
+        width: calc(100% - 2rem);
+    }
+    
+    .upgrade-item {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
 }
